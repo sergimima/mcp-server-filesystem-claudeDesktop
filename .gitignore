@@ -1,0 +1,15 @@
+# Archivos locales de configuración
+.env
+.env.local
+config.local.json
+
+# Logs
+*.log
+
+# Archivos temporales
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
