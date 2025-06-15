@@ -110,6 +110,25 @@ class FileServer {
             required: ['path', 'content'],
           },
         },
+        {
+          name: 'create_directory',
+          description: 'Create a new directory',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              path: {
+                type: 'string',
+                description: 'Path to the directory to create',
+              },
+              recursive: {
+                type: 'boolean',
+                description: 'Create parent directories if they do not exist',
+                default: true,
+              },
+            },
+            required: ['path'],
+          },
+        },
       ],
     }));
 
@@ -125,6 +144,8 @@ class FileServer {
           return await this.listDirectory(request.params.arguments?.path);
         case 'write_file':
           return await this.writeFile(request.params.arguments?.path, request.params.arguments?.content);
+        case 'create_directory':
+          return await this.createDirectory(request.params.arguments?.path, request.params.arguments?.recursive);
         default:
           throw new Error(`Unknown tool: ${request.params.name}`);
       }
@@ -276,6 +297,23 @@ class FileServer {
       };
     } catch (error) {
       throw new Error(`Failed to write file: ${error.message}`);
+    }
+  }
+
+  async createDirectory(relativePath, recursive = true) {
+    try {
+      const fullPath = this.resolvePath(relativePath);
+      await fs.mkdir(fullPath, { recursive });
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Directory created successfully at ${relativePath}`,
+          },
+        ],
+      };
+    } catch (error) {
+      throw new Error(`Failed to create directory: ${error.message}`);
     }
   }
 
